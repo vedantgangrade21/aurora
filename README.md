@@ -5,26 +5,34 @@ sits in the middle of the screen, the background is built from the colours of
 that cover, and the whole thing moves with the actual audio coming out of your
 speakers. Lyrics scroll underneath, in time with the song.
 
-When Spotify starts, Aurora quietly asks whether you want the display up.
+**Windows 10/11 only.** Needs Python 3.12 and Spotify Premium for the
+playback controls (the display itself works on any account).
 
-## Running it
+## Install
 
-```
-Aurora.bat
-```
+1. **Download** - the green **Code** button on GitHub -> **Download ZIP**, then
+   extract it somewhere permanent (e.g. `Documents\Aurora`). Or:
 
-That is it. `Aurora-debug.bat` does the same thing but keeps a console window
-open so you can see errors.
+   ```
+   git clone https://github.com/vedantgangrade21/aurora.git
+   ```
 
-Everything is already installed in `.venv`. If you ever need to rebuild it:
+2. **Install Python 3.12** if you don't have it:
 
-```
-py -3.12 -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
-```
+   ```
+   winget install Python.Python.3.12
+   ```
 
-Python 3.12 specifically: `PyAudioWPatch`, which does the audio capture, does
-not publish wheels for 3.14 yet.
+   3.12 specifically - `PyAudioWPatch`, which captures the audio, has no
+   wheels for newer versions yet.
+
+3. **Run `Setup.bat`.** It builds a private environment in `.venv`, installs
+   the dependencies, and offers to put a shortcut on your Desktop.
+
+4. **Run `Aurora.bat`** (or the shortcut). `Aurora-debug.bat` does the same but
+   keeps a console open so you can see errors.
+
+Then connect Spotify - below.
 
 ## First run: connecting Spotify
 
