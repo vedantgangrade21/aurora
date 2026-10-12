@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aurora</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="fx"></canvas>
+<div id="vignette"></div>
+<div id="grain"></div>
+
+<header id="chrome">
+  <div class="drag pywebview-drag-region">
+    <span class="mark"></span>
+    <span class="wordmark">Aurora</span>
+    <span id="srcdot" class="dot" title="Connecting"></span>
+  </div>
+  <nav class="tools">
+    <button id="btnLayout" class="tool" title="Layout (L)" aria-label="Change layout">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2"/></svg>
+    </button>
+    <button id="btnLyrics" class="tool" title="Lyrics (K)" aria-label="Toggle lyrics">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16M4 11h11M4 16h14"/></svg>
+    </button>
+    <button id="btnSettings" class="tool" title="Settings (S)" aria-label="Settings">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v2.6M12 18.8v2.6M21.4 12h-2.6M5.2 12H2.6M18.6 5.4l-1.8 1.8M7.2 16.8l-1.8 1.8M18.6 18.6l-1.8-1.8M7.2 7.2 5.4 5.4"/></svg>
+    </button>
+    <span class="sep"></span>
+    <button id="btnMin" class="tool" title="Minimize" aria-label="Minimize">
+      <svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg>
+    </button>
+    <button id="btnFull" class="tool" title="Fullscreen (F)" aria-label="Fullscreen">
+      <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+    </button>
+    <button id="btnClose" class="tool danger" title="Hide to tray (Esc)" aria-label="Hide">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main id="stage" data-layout="center" data-lyrics="on">
+  <section id="artwrap">
+    <div id="artglow"></div>
+    <div id="artframe">
+      <img class="art-layer" id="artA" alt="" draggable="false">
+      <img class="art-layer" id="artB" alt="" draggable="false">
+      <div id="artfallback"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4"/></svg></div>
+    </div>
+  </section>
+
+  <section id="info">
+    <p id="album"></p>
+    <h1 id="title">Aurora</h1>
+    <p id="artist">Waiting for Spotify</p>
+    <div id="progress">
+      <span id="tNow">0:00</span>
+      <div id="trackHit"><div id="track"><i id="fill"></i><b id="knob"></b></div></div>
+      <span id="tEnd">0:00</span>
+    </div>
+
+    <div id="transport">
+      <button id="btnPrev" class="tp" title="Previous (Shift + ←)" aria-label="Previous track">
+        <svg viewBox="0 0 24 24"><path d="M7 6.5v11"/><path class="solid" d="M18 6.5v11L9.6 12z"/></svg>
+      </button>
+      <button id="btnPlay" class="tp lead" title="Play or pause (Space)" aria-label="Play or pause">
+        <svg class="ico-play" viewBox="0 0 24 24"><path class="solid" d="M8.4 5.2v13.6L19 12z"/></svg>
+        <svg class="ico-pause" viewBox="0 0 24 24"><path d="M9.6 5.6v12.8M14.4 5.6v12.8" stroke-width="2.4"/></svg>
+      </button>
+      <button id="btnNext" class="tp" title="Next (Shift + →)" aria-label="Next track">
+        <svg viewBox="0 0 24 24"><path d="M17 6.5v11"/><path class="solid" d="M6 6.5v11L14.4 12z"/></svg>
+      </button>
+      <div id="vol">
+        <button id="btnMute" class="tp sm" title="Mute" aria-label="Mute">
+          <svg viewBox="0 0 24 24"><path class="solid" d="M4 9.4h3.3L11 6v12L7.3 14.6H4z"/><path class="wave" d="M14.6 9.5a3.4 3.4 0 0 1 0 5M17.2 7.2a7 7 0 0 1 0 9.6"/></svg>
+        </button>
+        <input id="volume" type="range" min="0" max="100" step="1" aria-label="Volume">
+      </div>
+      <button id="ctrlNote" class="note">Reconnect Spotify to enable playback controls</button>
+    </div>
+  </section>
+
+  <section id="lyricbox">
+    <div id="lyricScroll"><div id="lyricTrack"></div></div>
+    <p id="lyricNote"></p>
+  </section>
+</main>
+
+<div id="idle" class="overlay-msg" hidden>
+  <div class="pulse-ring"></div>
+  <h2>Nothing playing</h2>
+  <p>Start something in Spotify and it will appear here.</p>
+</div>
+
+<section id="setup" hidden>
+  <div class="card">
+    <span class="mark big"></span>
+    <h2>Connect Spotify</h2>
+    <p class="lede">Aurora reads what you are playing through your own Spotify app. It takes about a minute to set up, once.</p>
+    <ol class="steps">
+      <li>
+        <span class="n">1</span>
+        <div>Open the <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noreferrer">Spotify developer dashboard</a> and click <b>Create app</b>. Any name and description will do.</div>
+      </li>
+      <li>
+        <span class="n">2</span>
+        <div>Set the <b>Redirect URI</b> to exactly this, then tick the <b>Web API</b> checkbox:
+          <div class="copyrow"><code id="redirect">http://127.0.0.1:8888/callback</code><button id="btnCopy" class="ghost sm">Copy</button></div>
+        </div>
+      </li>
+      <li>
+        <span class="n">3</span>
+        <div>Open the app <b>Settings</b>, copy the <b>Client ID</b>, and paste it below.</div>
+      </li>
+    </ol>
+    <div class="field">
+      <input id="clientId" type="text" spellcheck="false" autocomplete="off" placeholder="Paste your Client ID">
+      <button id="btnConnect" class="primary">Connect</button>
+    </div>
+    <p id="authMsg" class="msg"></p>
+  </div>
+</section>
+
+<aside id="panel" hidden>
+  <div class="panel-head">
+    <h3>Settings</h3>
+    <button id="btnPanelClose" class="tool" aria-label="Close settings">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="panel-body">
+
+    <div class="group">
+      <h4>Look</h4>
+      <label class="row">
+        <span>Layout</span>
+        <div class="segmented" id="segLayout">
+          <button data-value="center">Centered</button>
+          <button data-value="split">Split</button>
+        </div>
+      </label>
+      <label class="row">
+        <span>Reactivity <em id="intensityVal">100%</em></span>
+        <input id="intensity" type="range" min="30" max="300" step="5">
+      </label>
+      <label class="row switch">
+        <span>Film grain</span>
+        <input id="grainToggle" type="checkbox"><i></i>
+      </label>
+    </div>
+
+    <div class="group">
+      <h4>Show on screen</h4>
+      <label class="row switch">
+        <span>Window bar <em>logo and buttons</em></span>
+        <input id="chromeToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Title and artist</span>
+        <input id="infoToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Progress bar</span>
+        <input id="progressToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Playback controls</span>
+        <input id="controlsToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Lyric ticker</span>
+        <input id="lyricsToggle" type="checkbox"><i></i>
+      </label>
+      <div class="pair">
+        <button id="btnArtOnly" class="ghost">Album art only</button>
+        <button id="btnShowAll" class="ghost">Show everything</button>
+      </div>
+      <p class="hint">With the window bar hidden, <kbd>S</kbd> still opens settings and <kbd>Esc</kbd> hides Aurora. The tray icon always works.</p>
+    </div>
+
+    <div class="group">
+      <h4>Lyrics</h4>
+      <label class="row">
+        <span>Timing offset <em id="offsetVal">0 ms</em></span>
+        <div class="nudge">
+          <button id="offMinus">-100</button>
+          <button id="offZero">Reset</button>
+          <button id="offPlus">+100</button>
+        </div>
+      </label>
+      <button id="btnRefetch" class="ghost wide">Re-fetch lyrics for this track</button>
+      <p class="hint">Lyrics come from LRCLIB, a free community database. Not every track has a synced version.</p>
+    </div>
+
+    <div class="group">
+      <h4>Window</h4>
+      <label class="row switch">
+        <span>Always on top</span>
+        <input id="onTopToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Open fullscreen</span>
+        <input id="fsToggle" type="checkbox"><i></i>
+      </label>
+    </div>
+
+    <div class="group">
+      <h4>When Spotify opens</h4>
+      <label class="row switch">
+        <span>Ask me to show Aurora</span>
+        <input id="notifyToggle" type="checkbox"><i></i>
+      </label>
+      <label class="row switch">
+        <span>Just open it, do not ask</span>
+        <input id="autoToggle" type="checkbox"><i></i>
+      </label>
+    </div>
+
+    <div class="group">
+      <h4>Connections</h4>
+      <p class="status-line"><b>Spotify</b><span id="spotifyState">-</span></p>
+      <p class="status-line"><b>Audio</b><span id="audioState">-</span></p>
+      <p class="status-line"><b>Controls</b><span id="controlState">-</span></p>
+      <div class="pair">
+        <button id="btnReconnect" class="ghost">Reconnect</button>
+        <button id="btnDisconnect" class="ghost danger">Disconnect</button>
+      </div>
+      <p class="hint">Reconnect re-runs Spotify authorization with the client ID already saved. Use it if playback controls report missing permissions.</p>
+    </div>
+
+    <p class="version">Aurora 1.0 &middot; press <kbd>?</kbd> for shortcuts</p>
+  </div>
+</aside>
+
+<div id="keys" hidden>
+  <div class="card">
+    <h3>Shortcuts</h3>
+    <ul>
+      <li><kbd>Space</kbd><span>Play or pause</span></li>
+      <li><kbd>←</kbd> <kbd>→</kbd><span>Seek 5 seconds</span></li>
+      <li><kbd>⇧</kbd> <kbd>←</kbd> <kbd>→</kbd><span>Previous or next track</span></li>
+      <li><kbd>↑</kbd> <kbd>↓</kbd><span>Volume</span></li>
+      <li><kbd>F</kbd><span>Fullscreen</span></li>
+      <li><kbd>L</kbd><span>Switch layout</span></li>
+      <li><kbd>K</kbd><span>Toggle lyrics</span></li>
+      <li><kbd>S</kbd><span>Settings</span></li>
+      <li><kbd>[</kbd> <kbd>]</kbd><span>Nudge lyric timing</span></li>
+      <li><kbd>Esc</kbd><span>Hide to tray</span></li>
+    </ul>
+  </div>
+</div>
+
+<div id="toastMsg"></div>
+
+<script src="config.js"></script>
+<script src="js/palette.js"></script>
+<script src="js/visualizer.js"></script>
+<script src="js/lyrics.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

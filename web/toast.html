@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Aurora</title>
+<link rel="icon" href="/icon.png" type="image/png">
+<style>
+:root{
+  --accent:#7c5cff;
+  --accent-hot:#b6a4ff;
+  --font:"Segoe UI Variable Display","Segoe UI",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{
+  font-family:var(--font);color:#f4f4f8;background:#0a0a11;
+  -webkit-font-smoothing:antialiased;user-select:none;cursor:default;
+}
+#card{
+  position:relative;height:100%;display:flex;flex-direction:column;
+  padding:17px 20px 14px 22px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(124,92,255,.20), transparent 62%),
+    linear-gradient(160deg,#12121c,#0a0a11);
+  border:1px solid rgba(255,255,255,.09);
+}
+#edge{
+  position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--accent-hot),var(--accent));
+}
+.head{display:flex;align-items:center;gap:9px}
+.mark{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  background:conic-gradient(from 200deg,var(--accent),var(--accent-hot),#fff9,var(--accent));
+  box-shadow:0 0 14px rgba(124,92,255,.55);
+}
+.head b{font-size:12.5px;font-weight:620;letter-spacing:-.005em}
+.head .tag{
+  margin-left:auto;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:rgba(255,255,255,.28);
+}
+#sub{
+  margin:9px 0 0;font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.58);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:auto}
+button{
+  font-family:inherit;font-size:12.5px;font-weight:560;padding:8px 16px;
+  border-radius:9px;border:1px solid transparent;cursor:pointer;
+  transition:filter .18s,background-color .18s,transform .15s;
+}
+button:active{transform:scale(.96)}
+.primary{color:#0b0b12;background:linear-gradient(135deg,var(--accent-hot),var(--accent));
+  box-shadow:0 8px 22px -10px rgba(124,92,255,.8)}
+.primary:hover{filter:brightness(1.09)}
+.ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.7)}
+.ghost:hover{background:rgba(255,255,255,.12);color:#fff}
+#timer{
+  position:absolute;left:0;bottom:0;height:2px;width:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-hot));
+  transform-origin:left;animation:drain 15s linear forwards;opacity:.55;
+}
+@keyframes drain{to{transform:scaleX(0)}}
+</style>
+</head>
+<body>
+<div id="card">
+  <div id="edge"></div>
+  <div class="head">
+    <span class="mark"></span>
+    <b>Spotify is open</b>
+    <span class="tag">Aurora</span>
+  </div>
+  <p id="sub">Show the ambient album display?</p>
+  <div class="actions">
+    <button class="ghost" id="no">Not now</button>
+    <button class="primary" id="yes">Show display</button>
+  </div>
+  <div id="timer"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var ws = null;
+
+  function connect() {
+    ws = new WebSocket("ws://127.0.0.1:" + window.AURORA_WS_PORT + "/?role=toast");
+    ws.onmessage = function (ev) {
+      if (typeof ev.data !== "string") return;
+      var msg;
+      try { msg = JSON.parse(ev.data); } catch (e) { return; }
+      if (msg.type === "track" && msg.track) {
+        document.getElementById("sub").textContent =
+          msg.track.title + " - " + msg.track.artist;
+      }
+    };
+    ws.onclose = function () { setTimeout(connect, 1500); };
+  }
+
+  function act(name) {
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: "action", name: name }));
+  }
+
+  document.getElementById("yes").onclick = function () { act("toast_show"); };
+  document.getElementById("no").onclick = function () { act("toast_dismiss"); };
+
+  // Restart the countdown each time the window is shown again.
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState !== "visible") return;
+    var bar = document.getElementById("timer");
+    bar.style.animation = "none";
+    void bar.offsetWidth;
+    bar.style.animation = "";
+  });
+
+  connect();
+})();
+</script>
+</body>
+</html>

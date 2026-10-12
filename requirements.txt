@@ -1,0 +1,8 @@
+pywebview
+PyAudioWPatch
+numpy
+psutil
+pystray
+pillow
+websockets
+requests
