@@ -5,13 +5,26 @@ sits in the middle of the screen, the background is built from the colours of
 that cover, and the whole thing moves with the actual audio coming out of your
 speakers. Lyrics scroll underneath, in time with the song.
 
+![Aurora, centred layout](docs/screenshots/aurora-centred.png)
+
 **Windows 10/11 only.** Needs Python 3.12 and Spotify Premium for the
 playback controls (the display itself works on any account).
 
+## Screenshots
+
+| Split layout | Album art only |
+| --- | --- |
+| ![Split layout, cover left and lyrics right](docs/screenshots/aurora-split.png) | ![Album art only mode](docs/screenshots/aurora-art-only.png) |
+
+![Settings panel](docs/screenshots/aurora-settings.png)
+
+*The cover, track and lyrics in these shots are made up for the demo.*
+
 ## Install
 
-1. **Download** - the green **Code** button on GitHub -> **Download ZIP**, then
-   extract it somewhere permanent (e.g. `Documents\Aurora`). Or:
+1. **Download** the latest `Aurora-vX.Y.Z.zip` from the
+   [Releases page](https://github.com/vedantgangrade21/aurora/releases/latest)
+   and extract it somewhere permanent (e.g. `Documents\Aurora`). Or:
 
    ```
    git clone https://github.com/vedantgangrade21/aurora.git
@@ -200,3 +213,10 @@ showing whatever it last displayed. If it happens again, the connection status
 in Settings will now say so directly and count down the wait. If Aurora ever
 refuses to start after a crash and claims another copy is running when there is
 not one, delete `%APPDATA%\Aurora\aurora.pid` and try again.
+
+## License
+
+Aurora is free software, released under the
+[GNU General Public License v3.0](LICENSE). You can use, study, share and
+modify it; if you distribute a modified version, it must stay under the GPL
+with its source available.
