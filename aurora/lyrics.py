@@ -5,10 +5,10 @@ import threading
 
 import requests
 
-from . import config
+from . import __version__, config
 
 API = "https://lrclib.net/api"
-UA = "Aurora/1.0.0 (local ambient album display)"
+UA = f"Aurora/{__version__} (local ambient album display)"
 
 # [mm:ss.xx] or [mm:ss.xxx], possibly several stamps on one line
 _STAMP = re.compile(r"\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]")
