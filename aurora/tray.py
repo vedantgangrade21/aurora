@@ -3,7 +3,6 @@ import threading
 
 import pystray
 
-from . import config
 from .icon import render as make_icon_image
 
 
@@ -20,12 +19,6 @@ class Tray:
                 pystray.MenuItem("Show display", self._show, default=True),
                 pystray.MenuItem("Settings", self._settings),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem(
-                    "Notify when Spotify opens",
-                    self._toggle_notify,
-                    checked=lambda _item: config.get("notify_on_spotify"),
-                ),
-                pystray.Menu.SEPARATOR,
                 pystray.MenuItem("Quit Aurora", self._quit),
             ),
         )
@@ -35,10 +28,6 @@ class Tray:
 
     def _settings(self, *_):
         self.on_settings()
-
-    def _toggle_notify(self, *_):
-        config.set_many({"notify_on_spotify": not config.get("notify_on_spotify")})
-        self.icon.update_menu()
 
     def _quit(self, *_):
         self.icon.visible = False

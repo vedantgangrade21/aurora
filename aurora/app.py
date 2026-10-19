@@ -16,8 +16,6 @@ from .watcher import SpotifyWatcher
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
-TOAST_W, TOAST_H = 392, 152
-TOAST_MARGIN = 24
 
 
 APP_ID = "Aurora.AmbientDisplay"
@@ -57,7 +55,6 @@ class Aurora:
         self.status = {"type": "status", "state": "starting", "message": ""}
 
         self.display = None
-        self.toast = None
         self.tray = None
         # pywebview does not report show/hide back to us, so track it ourselves.
         self._display_visible = not start_hidden
@@ -67,7 +64,6 @@ class Aurora:
         self._wake = threading.Event()
         self._quitting = False
         self._lyrics_token = 0
-        self._toast_timer = None
 
     # ---- setup --------------------------------------------------------
 
@@ -104,20 +100,6 @@ class Aurora:
         )
         self.display.events.closing += self._on_display_closing
 
-        self.toast = webview.create_window(
-            "Aurora",
-            url.replace("index.html", "toast.html"),
-            width=TOAST_W,
-            height=TOAST_H,
-            frameless=True,
-            easy_drag=False,
-            on_top=True,
-            resizable=False,
-            background_color="#07070C",
-            hidden=True,
-        )
-        self.toast.events.closing += self._on_toast_closing
-
         self.tray = Tray(self.show_display, self.open_settings, self.quit)
         self.tray.start()
 
@@ -127,39 +109,20 @@ class Aurora:
 
         # Older pywebview builds do not take an icon; fall back rather than fail.
         try:
-            webview.start(self._after_start, private_mode=False, debug=False,
-                          icon=str(ico_path))
+            webview.start(private_mode=False, debug=False, icon=str(ico_path))
         except TypeError:
-            webview.start(self._after_start, private_mode=False, debug=False)
+            webview.start(private_mode=False, debug=False)
         self.shutdown()
-
-    def _after_start(self):
-        self._position_toast()
-
-    def _position_toast(self):
-        try:
-            screen = webview.screens[0]
-            x = screen.width - TOAST_W - TOAST_MARGIN
-            y = screen.height - TOAST_H - TOAST_MARGIN - 48
-            self.toast.move(int(x), int(y))
-        except Exception:
-            pass
 
     # ---- window plumbing ----------------------------------------------
 
     # pywebview may or may not hand the window to event handlers depending on
-    # version, so both of these stay tolerant about their arguments.
+    # version, so this stays tolerant about its arguments.
     def _on_display_closing(self, *_args):
         if self._quitting:
             return True
         self.display.hide()   # closing the display just parks it in the tray
         self._display_visible = False
-        return False
-
-    def _on_toast_closing(self, *_args):
-        if self._quitting:
-            return True
-        self.hide_toast()
         return False
 
     def show_display(self):
@@ -174,52 +137,19 @@ class Aurora:
         self.show_display()
         self.server.broadcast({"type": "open_settings"})
 
-    def show_toast(self):
-        if not self.toast:
-            return
-        self._position_toast()
-        try:
-            self.toast.show()
-        except Exception:
-            return
-        if self._toast_timer:
-            self._toast_timer.cancel()
-        self._toast_timer = threading.Timer(15.0, self.hide_toast)
-        self._toast_timer.daemon = True
-        self._toast_timer.start()
-
-    def hide_toast(self):
-        if self._toast_timer:
-            self._toast_timer.cancel()
-            self._toast_timer = None
-        try:
-            self.toast.hide()
-        except Exception:
-            pass
-
     def on_spotify_launch(self):
-        if not config.get("notify_on_spotify"):
-            return
-        if config.get("auto_open"):
+        # Optional: bring the display up when Spotify starts. Off by default.
+        if config.get("auto_open") and not self._display_visible:
             self.show_display()
-            return
-        if self._display_visible:
-            return   # already on screen, no need to ask
-        self.show_toast()
 
     def quit(self):
         self._quitting = True
         self._stop.set()
         self._wake.set()
         try:
-            self.hide_toast()
+            self.display.destroy()
         except Exception:
             pass
-        for window in (self.toast, self.display):
-            try:
-                window.destroy()
-            except Exception:
-                pass
 
     def shutdown(self):
         self._stop.set()
@@ -438,11 +368,6 @@ class Aurora:
             self.display.toggle_fullscreen()
         elif name == "quit":
             self.quit()
-        elif name == "toast_show":
-            self.hide_toast()
-            self.show_display()
-        elif name == "toast_dismiss":
-            self.hide_toast()
 
     def _connect(self, client_id: str, force_dialog: bool = False):
         client_id = client_id.strip()

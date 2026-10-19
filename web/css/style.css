@@ -400,7 +400,7 @@ body[data-chrome="off"] #chrome .drag{pointer-events:auto}
   color:var(--accent-hot);
   filter:drop-shadow(0 1px 26px var(--accent-glow));
 }
-.lyric.inst{font-size:1.6em;line-height:1.1;opacity:.16}
+.lyric.inst{font-size:2.4em;line-height:1.1;opacity:.16}
 /* Browsing: lift every line out of the blur so the whole song is readable;
    the sung line keeps its accent so you can still see where the music is. */
 #lyricTrack.browsing .lyric{opacity:.62;filter:none;transform:none}

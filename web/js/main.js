@@ -562,7 +562,6 @@
     setChecked("chromeToggle", cfg.show_chrome !== false);
     setChecked("onTopToggle", !!cfg.always_on_top);
     setChecked("fsToggle", !!cfg.start_fullscreen);
-    setChecked("notifyToggle", !!cfg.notify_on_spotify);
     setChecked("autoToggle", !!cfg.auto_open);
 
     var intensity = Math.round((cfg.intensity == null ? 1 : cfg.intensity) * 100);
@@ -633,7 +632,6 @@
   });
   bindSwitch("onTopToggle", "always_on_top");
   bindSwitch("fsToggle", "start_fullscreen");
-  bindSwitch("notifyToggle", "notify_on_spotify");
   bindSwitch("autoToggle", "auto_open");
 
   $("intensity").addEventListener("input", function () {

@@ -14,8 +14,7 @@ LYRICS_DIR = CACHE_DIR / "lyrics"
 DEFAULTS = {
     "client_id": "",
     "refresh_token": "",
-    "notify_on_spotify": False,   # opt-in: no popup unless asked for
-    "auto_open": False,
+    "auto_open": False,          # bring Aurora up when Spotify starts
     "layout": "center",          # center | split
     "lyrics_offset_ms": 0,
     "show_lyrics": True,

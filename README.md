@@ -115,7 +115,8 @@ Reachable with `S`, or from the tray icon.
   still opens settings, `Esc` still hides Aurora, and the tray icon always
   works - and an invisible strip along the top stays draggable.
 - **Always on top / Open fullscreen** - window behaviour.
-- **When Spotify opens** - ask first (default), just open it, or do nothing.
+- **When Spotify opens** - optionally bring Aurora up on its own as soon as
+  Spotify starts. Off by default.
 
 ## How it works
 
