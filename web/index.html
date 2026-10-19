@@ -153,6 +153,30 @@
     </div>
 
     <div class="group">
+      <h4>Colours</h4>
+      <label class="row">
+        <span>Colour from</span>
+        <div class="segmented" id="segColor">
+          <button data-value="cover">Album cover</button>
+          <button data-value="custom">Custom</button>
+        </div>
+      </label>
+      <div class="row" id="customColorRow">
+        <span>Colour <em id="customHex">#7c5cff</em></span>
+        <div class="swatches" id="swatches">
+          <button data-color="#7c5cff" style="--c:#7c5cff" aria-label="Violet"></button>
+          <button data-color="#ff5c8a" style="--c:#ff5c8a" aria-label="Pink"></button>
+          <button data-color="#ff8a3d" style="--c:#ff8a3d" aria-label="Orange"></button>
+          <button data-color="#f5c542" style="--c:#f5c542" aria-label="Gold"></button>
+          <button data-color="#3ddc97" style="--c:#3ddc97" aria-label="Mint"></button>
+          <button data-color="#3db8ff" style="--c:#3db8ff" aria-label="Sky"></button>
+          <label class="picker" title="Pick any colour"><input id="customColor" type="color" aria-label="Pick any colour"></label>
+        </div>
+      </div>
+      <p class="hint">Album cover follows each track's artwork. Custom keeps one colour for the background, glow and every highlight.</p>
+    </div>
+
+    <div class="group">
       <h4>Show on screen</h4>
       <label class="row switch">
         <span>Window bar <em>logo and buttons</em></span>

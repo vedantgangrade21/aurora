@@ -1,6 +1,7 @@
 r"""Persistent configuration stored in %APPDATA%\Aurora."""
 import json
 import os
+import re
 import threading
 from pathlib import Path
 
@@ -24,7 +25,9 @@ DEFAULTS = {
     "show_chrome": True,         # logo top-left, window buttons top-right
     "always_on_top": False,
     "start_fullscreen": True,
-    "intensity": 1.0,            # 0.3 .. 1.6 visual strength
+    "intensity": 1.0,            # 0.3 .. 3.0 visual strength
+    "color_mode": "cover",       # cover | custom
+    "custom_color": "#7c5cff",
     "grain": True,
 }
 
@@ -79,6 +82,12 @@ def set_many(patch: dict):
         for k, v in patch.items():
             if k not in DEFAULTS:
                 continue
+            if k == "color_mode" and v not in ("cover", "custom"):
+                continue
+            if k == "custom_color":
+                if not isinstance(v, str) or not re.fullmatch(r"#[0-9a-fA-F]{6}", v):
+                    continue
+                v = v.lower()
             if k in CLAMPS:
                 low, high = CLAMPS[k]
                 try:

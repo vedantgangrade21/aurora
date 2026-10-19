@@ -3,10 +3,13 @@
 (function (global) {
   "use strict";
 
-  var KEYS = ["base", "accent", "accentHot", "orb0", "orb1", "orb2", "orb3", "orb4"];
+  var KEYS = ["base", "panel", "tint", "accent", "accentHot",
+              "orb0", "orb1", "orb2", "orb3", "orb4"];
 
   var DEFAULT = {
     base: [7, 7, 12],
+    panel: [18, 16, 30],
+    tint: [222, 214, 255],
     accent: [124, 92, 255],
     accentHot: [182, 164, 255],
     orb0: [124, 92, 255],
@@ -127,22 +130,50 @@
     if (!dark) dark = { h: dominant.h, s: dominant.s, l: 0.22 };
     if (!muted) muted = { h: dominant.h, s: dominant.s * 0.35, l: 0.44 };
 
+    return build(vibrant, light, dark, muted);
+  }
+
+  /* One palette shape for both sources. Everything - the background base,
+     the glass panels, the secondary text - hangs off the accent hue, so the
+     whole interface reads as one colour family rather than just the
+     highlights. */
+  function build(vibrant, light, dark, muted) {
     var accent = {
       h: vibrant.h,
       s: Math.max(0.5, Math.min(0.95, vibrant.s * 1.25)),
       l: Math.max(0.5, Math.min(0.66, vibrant.l))
     };
-
+    var hot = hsl2rgb(accent.h, Math.min(0.9, accent.s * 1.05), 0.76);
     return {
-      base: hsl2rgb(dominant.h, Math.min(0.55, dominant.s * 0.85), 0.052),
+      base: hsl2rgb(accent.h, Math.min(0.5, accent.s * 0.55), 0.06),
+      panel: hsl2rgb(accent.h, Math.min(0.4, accent.s * 0.4), 0.1),
+      // Secondary text: the accent washed most of the way to white, so it
+      // stays readable while still clearly belonging to the cover.
+      tint: [hot[0] + (255 - hot[0]) * 0.55, hot[1] + (255 - hot[1]) * 0.55,
+             hot[2] + (255 - hot[2]) * 0.55],
       accent: shape(accent),
-      accentHot: hsl2rgb(accent.h, Math.min(0.9, accent.s * 1.05), 0.76),
+      accentHot: hot,
       orb0: shape(accent, Math.min(1, accent.s * 1.1), 0.56),
       orb1: hsl2rgb(light.h, Math.max(0.4, light.s), 0.66),
       orb2: hsl2rgb(accent.h + 0.09, Math.max(0.45, accent.s * 0.9), 0.5),
       orb3: hsl2rgb(muted.h, Math.max(0.22, muted.s), 0.42),
       orb4: hsl2rgb(dark.h, Math.max(0.35, dark.s), 0.3)
     };
+  }
+
+  /* A full palette from a single chosen colour (the "custom colour" mode). */
+  function fromHex(hex) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(hex || "");
+    if (!m) return Object.assign({}, DEFAULT);
+    var n = parseInt(m[1], 16);
+    var hsl = rgb2hsl((n >> 16) & 255, (n >> 8) & 255, n & 255);
+    var c = { h: hsl[0], s: Math.max(0.35, hsl[1]), l: hsl[2] };
+    return build(
+      { h: c.h, s: c.s, l: Math.max(0.45, Math.min(0.62, c.l)) },
+      { h: c.h + 0.04, s: c.s * 0.8, l: 0.72 },
+      { h: c.h - 0.03, s: c.s, l: 0.24 },
+      { h: c.h, s: c.s * 0.35, l: 0.44 }
+    );
   }
 
   function lerp(a, b, t) {
@@ -172,6 +203,12 @@
     s.setProperty("--accent", css(p.accent));
     s.setProperty("--accent-hot", css(p.accentHot));
     s.setProperty("--accent-glow", rgba(p.accent, 0.45));
+    s.setProperty("--glass", rgba(p.panel, 0.8));
+    s.setProperty("--hair", rgba(p.accentHot, 0.13));
+    s.setProperty("--text-soft", rgba(p.tint, 0.45));
+    s.setProperty("--dim", rgba(p.tint, 0.66));
+    s.setProperty("--faint", rgba(p.tint, 0.36));
+    s.setProperty("--track-bg", rgba(p.tint, 0.14));
     document.body.style.backgroundColor = css(p.base);
   }
 
@@ -179,6 +216,7 @@
     KEYS: KEYS,
     DEFAULT: DEFAULT,
     extract: extract,
+    fromHex: fromHex,
     lerp: lerp,
     css: css,
     rgba: rgba,

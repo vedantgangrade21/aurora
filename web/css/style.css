@@ -13,6 +13,8 @@
   --dim:rgba(246,246,249,.55);
   --glass:rgba(16,16,24,.74);
   --hair:rgba(255,255,255,.09);
+  --faint:rgba(255,255,255,.34);
+  --track-bg:rgba(255,255,255,.13);
   --font:"Segoe UI Variable Display","Segoe UI Variable Text","Segoe UI",Inter,system-ui,-apple-system,sans-serif;
   --pulse:0;
   --ease:cubic-bezier(.22,.61,.36,1);
@@ -83,7 +85,7 @@ body.idle-ui #chrome{opacity:0;pointer-events:none}
 .mark.big{width:34px;height:34px;margin-bottom:20px}
 .wordmark{
   font-size:12px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
-  color:rgba(255,255,255,.34);
+  color:var(--faint);
 }
 .dot{
   width:6px;height:6px;border-radius:50%;background:#f0a83c;flex:none;
@@ -212,7 +214,7 @@ body.idle-ui #chrome{opacity:0;pointer-events:none}
 }
 #album{
   margin:0;font-size:10.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:rgba(255,255,255,.34);
+  color:var(--faint);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
 #title{
@@ -230,13 +232,13 @@ body.idle-ui #chrome{opacity:0;pointer-events:none}
   display:flex;align-items:center;gap:12px;margin-top:11px;
   width:min(440px,72vw);
   font-size:10.5px;font-variant-numeric:tabular-nums;letter-spacing:.06em;
-  color:rgba(255,255,255,.35);
+  color:var(--faint);
 }
 /* Generous invisible hit area - a 3px bar is far too fine to grab. */
 #trackHit{flex:1;padding:9px 0;cursor:pointer;touch-action:none}
 #track{
   position:relative;height:3px;border-radius:99px;
-  background:rgba(255,255,255,.13);
+  background:var(--track-bg);
   transition:height .18s var(--ease);
 }
 #trackHit:hover #track,#trackHit.scrubbing #track{height:5px}
@@ -399,6 +401,12 @@ body[data-chrome="off"] #chrome .drag{pointer-events:auto}
   filter:drop-shadow(0 1px 26px var(--accent-glow));
 }
 .lyric.inst{font-size:.8em;letter-spacing:.5em;opacity:.16}
+/* Browsing: lift every line out of the blur so the whole song is readable;
+   the sung line keeps its accent so you can still see where the music is. */
+#lyricTrack.browsing .lyric{opacity:.62;filter:none;transform:none}
+#lyricTrack.browsing .lyric.active{opacity:1;transform:scale(1.045)}
+#lyricScroll{cursor:grab;touch-action:none}
+#lyricScroll:active{cursor:grabbing}
 .lyric.inst.active{color:var(--accent-hot);opacity:.7}
 
 #lyricNote{
@@ -518,7 +526,7 @@ input[type=text]::placeholder{color:rgba(255,255,255,.26)}
 .group:last-of-type{border-bottom:0}
 .group h4{
   margin:0 0 14px;font-size:10.5px;font-weight:640;letter-spacing:.17em;text-transform:uppercase;
-  color:rgba(255,255,255,.34);
+  color:var(--faint);
 }
 .row{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -535,6 +543,21 @@ input[type=text]::placeholder{color:rgba(255,255,255,.26)}
 }
 .segmented button.on{background:rgba(255,255,255,.13);color:#fff}
 
+.swatches{display:flex;align-items:center;gap:7px}
+.swatches button,.swatches .picker{
+  width:20px;height:20px;border-radius:50%;padding:0;cursor:pointer;flex:none;
+  border:2px solid transparent;background:var(--c);
+  box-shadow:0 0 0 1px rgba(255,255,255,.14) inset;
+  transition:transform .15s,border-color .15s;
+}
+.swatches button:hover,.swatches .picker:hover{transform:scale(1.15)}
+.swatches button.on{border-color:#fff}
+.swatches .picker{
+  position:relative;overflow:hidden;
+  background:conic-gradient(#ff5c5c,#ffd85c,#5cff8a,#5cc8ff,#a45cff,#ff5c5c);
+}
+.swatches .picker.on{border-color:#fff}
+.swatches .picker input{position:absolute;inset:-8px;opacity:0;cursor:pointer}
 .nudge{display:flex;gap:5px}
 .nudge button{
   border:1px solid var(--hair);background:rgba(255,255,255,.05);color:rgba(255,255,255,.72);

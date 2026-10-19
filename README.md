@@ -64,6 +64,13 @@ refresh token in `%APPDATA%\Aurora\config.json` and never asks again.
 
 Nothing leaves your machine except the Spotify API calls and the lyric lookup.
 
+## Browsing the lyrics
+
+Scroll the lyric ticker with the mouse wheel, or drag it, to read ahead or back
+through the song. Every line comes out of the blur while you browse, and the
+line being sung stays highlighted. Leave it alone for three seconds and it
+glides back to wherever the song has got to.
+
 ## Keyboard
 
 | Key | Does |
@@ -90,6 +97,10 @@ Reachable with `S`, or from the tray icon.
 - **Layout** - cover centred with lyrics below, or cover left and lyrics right.
 - **Reactivity** - how strongly the visuals respond to the music, from 30% up
   to 300%. Past about 180% every beat also throws a second, trailing ring.
+- **Colours** - *Album cover* takes the accent from each track's artwork and
+  tints everything with it: the background, the glow, the panels, the progress
+  bar and the secondary text. *Custom* holds one colour instead - pick a swatch
+  or any colour from the picker - and switching between the two fades across.
 - **Film grain** - the subtle texture over everything. Turn it off if you find
   it distracting.
 - **Timing offset** - if lyrics run early or late, shift them. Per-install, not

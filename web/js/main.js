@@ -39,6 +39,16 @@
 
   var palCur = P.DEFAULT;
   var palTarget = P.DEFAULT;
+  var coverPal = P.DEFAULT;   // what the current artwork yields, kept even
+                              // while a custom colour is in use
+
+  /* The palette the screen should be heading towards, from whichever source
+     the user picked. palCur then morphs to it, so switching is a smooth fade. */
+  function choosePalette() {
+    palTarget = cfg.color_mode === "custom"
+      ? P.fromHex(cfg.custom_color || "#7c5cff")
+      : coverPal;
+  }
   var palApplied = null;
 
   var currentTrack = null;
@@ -414,13 +424,15 @@
 
         el.artframe.classList.add("has-art");
         el.artglow.style.backgroundImage = "url(" + t.art + ")";
-        palTarget = P.extract(loaded);
+        coverPal = P.extract(loaded);
+        choosePalette();
       } else {
         artLayers[artFront].classList.remove("show");
         artLayers[artFront].classList.add("leaving");
         el.artframe.classList.remove("has-art");
         el.artglow.style.backgroundImage = "";
-        palTarget = P.DEFAULT;
+        coverPal = P.DEFAULT;
+        choosePalette();
       }
 
       // Park the new text below for one frame, then let it transition up.
@@ -558,6 +570,25 @@
     $("intensityVal").textContent = intensity + "%";
     $("offsetVal").textContent = (cfg.lyrics_offset_ms || 0) + " ms";
 
+    var colorMode = cfg.color_mode === "custom" ? "custom" : "cover";
+    var hex = (cfg.custom_color || "#7c5cff").toLowerCase();
+    var cSegs = $("segColor").children;
+    for (var ci = 0; ci < cSegs.length; ci++) {
+      cSegs[ci].classList.toggle("on", cSegs[ci].dataset.value === colorMode);
+    }
+    $("customColorRow").hidden = colorMode !== "custom";
+    $("customHex").textContent = hex;
+    $("customColor").value = hex;
+    var known = false;
+    var sw = $("swatches").querySelectorAll("button");
+    for (var si = 0; si < sw.length; si++) {
+      var hit = sw[si].dataset.color === hex;
+      sw[si].classList.toggle("on", hit);
+      known = known || hit;
+    }
+    $("swatches").querySelector(".picker").classList.toggle("on", !known);
+    choosePalette();
+
     var segs = $("segLayout").children;
     for (var i = 0; i < segs.length; i++) {
       segs[i].classList.toggle("on", segs[i].dataset.value === (cfg.layout || "center"));
@@ -611,6 +642,23 @@
   });
   $("intensity").addEventListener("change", function () {
     setting({ intensity: this.value / 100 });
+  });
+
+  $("segColor").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button");
+    if (btn) setting({ color_mode: btn.dataset.value });
+  });
+  $("swatches").addEventListener("click", function (ev) {
+    var btn = ev.target.closest("button[data-color]");
+    if (btn) setting({ color_mode: "custom", custom_color: btn.dataset.color });
+  });
+  // Live preview while dragging in the picker; saved once it is let go.
+  $("customColor").addEventListener("input", function () {
+    $("customHex").textContent = this.value;
+    palTarget = P.fromHex(this.value);
+  });
+  $("customColor").addEventListener("change", function () {
+    setting({ color_mode: "custom", custom_color: this.value });
   });
 
   $("segLayout").addEventListener("click", function (ev) {
