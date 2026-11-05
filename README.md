@@ -22,7 +22,7 @@ playback controls (the display itself works on any account).
 
 ## Install
 
-1. **Download** the latest `Aurora-vX.Y.Z.zip` from the
+1. **Download** the latest `Aurora-vX.zip` from the
    [Releases page](https://github.com/vedantgangrade21/aurora/releases/latest)
    and extract it somewhere permanent (e.g. `Documents\Aurora`). Or:
 
