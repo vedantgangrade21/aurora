@@ -101,6 +101,8 @@ Reachable with `S`, or from the tray icon.
   tints everything with it: the background, the glow, the panels, the progress
   bar and the secondary text. *Custom* holds one colour instead - pick a swatch
   or any colour from the picker - and switching between the two fades across.
+  The cover accent is the colour that most fills the artwork, sampled from its
+  own pixels; covers with no real colour resolve to white or black.
 - **Film grain** - the subtle texture over everything. Turn it off if you find
   it distracting.
 - **Timing offset** - if lyrics run early or late, shift them. Per-install, not
